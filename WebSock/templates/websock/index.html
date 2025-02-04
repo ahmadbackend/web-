@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Chat Rooms</title>
+</head>
+<body>
+    <h3>read text file using websockets</h3><br>
+    <button type="button" id="nextChunkButton"> click me</button>
+    <div id="readingArea">
+
+    </div>
+
+    <script>
+        const reader = document.querySelector('#nextChunkButton');
+
+
+
+        const readSocket = new WebSocket('ws://'
+            + window.location.host
+            + '/ws/Read/'
+
+            );
+        readSocket.onopen = function () {
+    console.log("WebSocket connected!");
+};
+
+// Function to request the next 100 lines
+function requestNextChunk() {
+    readSocket.send(JSON.stringify({ 'message': 'next' }));
+}
+
+readSocket.onmessage = function (e) {
+    const data = JSON.parse(e.data);
+
+    console.log("Received chunk:", data.chunk[0]);
+    let readingarea = document.querySelector('#readingArea');
+    readingarea.innerHTML = "";
+    var content = document.createTextNode(data.chunk);
+    readingarea.appendChild(content);
+    content = "";
+
+};
+
+readSocket.onclose = function (e) {
+    console.error("WebSocket closed unexpectedly");
+};
+
+document.getElementById("nextChunkButton").addEventListener("click", requestNextChunk);
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>
